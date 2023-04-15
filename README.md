@@ -18,11 +18,11 @@ RentaTreat is a web service that allows users to rent apartments for short-term 
 
 ## Technologies used
 
-- Front-end: HTML, CSS, JavaScript, React.js
-- Back-end: Node.js, Express.js, MongoDB
+- Front-end: HTML, CSS, JavaScript, React
+- Back-end: Golang, Gin, GORM
 - Payment processing: Stripe
 - Image recognition: Google Cloud Vision API
-- Communication: Twilio Programmable Chat
+- Database: MongoDB, MySQL
 
 ## Getting started
 
