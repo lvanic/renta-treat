@@ -1,6 +1,4 @@
 package model
 
-type Token struct{
-	
-
+type Token struct {
 }
