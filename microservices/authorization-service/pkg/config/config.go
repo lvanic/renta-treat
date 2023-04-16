@@ -1,23 +1,37 @@
 package config
 
 import (
-	"os"
-	"strconv"
+	"sync"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
-	DatabaseURL string
-	Port        int
-	DebugMode   bool
+	DatabaseURL   string
+	Port          string
+	DebugMode     bool
+	Secret        string
+	TokenLifespan int
 }
 
-func NewConfig() *Config {
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	debugMode, _ := strconv.ParseBool(os.Getenv("DEBUG_MODE"))
+var once sync.Once
+var instance *Config
 
-	return &Config{
-		DatabaseURL: os.Getenv("DATABASE_URL"),
-		Port:        port,
-		DebugMode:   debugMode,
-	}
+func NewConfig() *Config {
+	once.Do(func() {
+		port := viper.Get("PORT").(string)
+		databaseURL := viper.Get("DatabaseURL").(string)
+		debugMode := viper.GetBool("DEBUG_MODE")
+		secret := viper.Get("API_SECRET").(string)
+		tokenLifespan := viper.GetInt("TOKEN_HOUR_LIFESPAN")
+		instance = &Config{
+			DatabaseURL:   databaseURL,
+			Port:          port,
+			DebugMode:     debugMode,
+			Secret:        secret,
+			TokenLifespan: tokenLifespan,
+		}
+	})
+	return instance
+
 }

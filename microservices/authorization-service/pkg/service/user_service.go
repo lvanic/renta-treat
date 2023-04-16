@@ -1,10 +1,15 @@
 package service
 
 import (
+	"crypto/rand"
+	"errors"
 	"go/pkg/model"
 	"go/pkg/repository"
+	"go/pkg/utils"
 	"sync"
 )
+
+const SALT_LENGTH = 16
 
 type UserService struct {
 	userRepository repository.UserRepository
@@ -21,18 +26,29 @@ func NewUserService(userRepository repository.UserRepository) *UserService {
 }
 
 func (s *UserService) CreateUser(user *model.User) error {
-	if err := s.userRepository.Create(user); err != nil {
-		return err
+	randomBytes := make([]byte, SALT_LENGTH)
+	if _, err := rand.Read(randomBytes); err != nil {
+		panic(err)
+	}
+	user.Salt = randomBytes
+	user.Password = utils.HashPassword(user.Password, user.Salt)
+	err := s.userRepository.Create(user)
+	return err
+}
+
+func (s *UserService) AuthorizeUser(user *model.User) (*model.User, error) {
+	userHandler, err := s.userRepository.GetOneByEmail(user.Email)
+	if err != nil {
+		return nil, err
+	}
+	if isPasswordsMatch := utils.ComparePassword(user.Password, userHandler.Salt, userHandler.Password); isPasswordsMatch {
+		return userHandler, nil
 	} else {
-		return nil
+		return nil, errors.New("Incorrect credetinals")
 	}
 }
 
 func (s *UserService) GetUserById(id int) (*model.User, error) {
-
-	if user, err := s.userRepository.GetOne(id); err != nil {
-		return nil, err
-	} else {
-		return user, nil
-	}
+	user, err := s.userRepository.GetOneById(id)
+	return user, err
 }

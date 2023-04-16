@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go/pkg/config"
 	"go/pkg/model"
 	"go/pkg/router"
 	"log"
@@ -15,10 +16,8 @@ func main() {
 	viper.SetConfigFile("../config/.env")
 	viper.ReadInConfig()
 
-	port := viper.Get("PORT").(string)
-	dsn := viper.Get("DatabaseURL").(string)
-
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	config := config.NewConfig()
+	db, err := gorm.Open(mysql.Open(config.DatabaseURL), &gorm.Config{})
 
 	if err != nil {
 		panic("Database open error")
@@ -28,6 +27,6 @@ func main() {
 	r := gin.Default()
 	router.RegisterRoutes(r, db)
 
-	log.Fatal(r.Run(port))
+	log.Fatal(r.Run(config.Port))
 
 }

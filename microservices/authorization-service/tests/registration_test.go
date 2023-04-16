@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestAuthorization(t *testing.T) {
+func TestRegistration(t *testing.T) {
 
 }
